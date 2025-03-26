@@ -184,3 +184,4 @@ plugins/*
 
 dags/*
 !dags/.gitkeep
+!dags/hello_world.py
