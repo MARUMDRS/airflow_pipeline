@@ -173,15 +173,15 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-logs/*
-!logs/.gitkeep
+airflow/logs/*
+!airflow/logs/.gitkeep
 
-config/*
-!config/.gitkeep
+airflow/config/*
+!airflow/config/.gitkeep
 
-plugins/*
-!plugins/.gitkeep
+airflow/plugins/*
+!airflow/plugins/.gitkeep
 
-dags/*
-!dags/.gitkeep
-!dags/hello_world.py
+airflow/dags/*
+!airflow/dags/.gitkeep
+!airflow/dags/hello_world.py
