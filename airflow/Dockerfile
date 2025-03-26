@@ -13,9 +13,10 @@ ENV JAVA_FOLDER jdk-17.0.12
 ENV JVM_ROOT /usr/lib/jvm
 
 # Tar.gz file name
-ENV JAVA_PKG_NAME jdk-17_linux-x64_bin.tar.gz
+ENV JAVA_PKG_NAME jdk-17.0.12_linux-x64_bin.tar.gz
+
 # Java download URL
-ENV JAVA_TAR_GZ_URL https://download.oracle.com/java/17/latest/$JAVA_PKG_NAME
+ENV JAVA_TAR_GZ_URL https://download.oracle.com/java/17/archive/$JAVA_PKG_NAME
 
 
 # Update apt again before installing wget; Install wget; Remove the apt lists
