@@ -19,7 +19,7 @@ def init_spark():
     mongodb_uri = f"mongodb://{mongo_user}:{mongo_pass}@{mongo_host}:{mongo_port}/"
     
     conf = SparkConf()
-    conf.setMaster(spark_uri).setAppName("DAE Spark")
+    conf.setMaster(spark_uri).setAppName("Seminar Spark")
     conf.set("spark.submit.deployMode", "client")
     conf.set("spark.driver.bindAddress", "0.0.0.0")
     conf.set("spark.driver.host", "airflow-worker")
