@@ -64,13 +64,13 @@ def load():
 
     data = list(transform_collection.find({}))  # Retrieve transformed data
     final_collection.delete_many({})
-    final_collection.insert_many(data)  
+    final_collection.insert_many(data)
     print(
         f"Loaded {len(data)} records into final MongoDB collection '{MONGO_ETL_LOAD_COLLECTION}'."
     )
 
 
-# Define DAG
+# Define default arguments for DAG
 default_args = {
     'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME"),
     'depends_on_past': False,
@@ -78,27 +78,27 @@ default_args = {
     'retries': 1,
 }
 
-with DAG(
-        'simple_etl_pipeline',
-        default_args=default_args,
-        description='ETL pipeline using MongoDB as intermediate storage',
-        schedule_interval='@daily',
-        catchup=False,
-) as dag:
+dag = DAG('simple_etl_pipeline',
+          default_args=default_args,
+          description='ETL pipeline using MongoDB as intermediate storage',
+          schedule_interval='@daily',
+          catchup=False)
 
-    extract_task = PythonOperator(
-        task_id=MONGO_ETL_EXTRACT_COLLECTION,  # 'extract_data',
-        python_callable=extract,
-    )
+# Define the tasks using PythonOperator
+extract_task = PythonOperator(
+    task_id=MONGO_ETL_EXTRACT_COLLECTION,  # 'extract_data',
+    python_callable=extract,
+)
 
-    transform_task = PythonOperator(
-        task_id=MONGO_ETL_TRANSFORM_COLLECTION,  # 'transform_data',
-        python_callable=transform,
-    )
+transform_task = PythonOperator(
+    task_id=MONGO_ETL_TRANSFORM_COLLECTION,  # 'transform_data',
+    python_callable=transform,
+)
 
-    load_task = PythonOperator(
-        task_id=MONGO_ETL_LOAD_COLLECTION,  # 'load_data',
-        python_callable=load,
-    )
+load_task = PythonOperator(
+    task_id=MONGO_ETL_LOAD_COLLECTION,  # 'load_data',
+    python_callable=load,
+)
 
-    extract_task >> transform_task >> load_task
+# Define task dependencies
+extract_task >> transform_task >> load_task

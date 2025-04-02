@@ -24,17 +24,6 @@ MONGO_ML_TRANSFORM_COLLECTION = os.environ.get(
     "MONGO_ML_TRANSFORM_COLLECTION")
 MONGO_ML_TRAIN_COLLECTION = os.environ.get("MONGO_ML_TRAIN_COLLECTION")
 
-default_args = {'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME")}
-
-# Define the DAG
-dag = DAG(
-    'simple_ml_pipeline',
-    default_args=default_args,
-    description='A simple ML pipeline with three tasks',
-    schedule_interval=None,
-)
-
-
 def save_confusion_matrix(cm, output_path):
     plt.figure(figsize=(8, 6))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
@@ -188,6 +177,16 @@ def train_model():
         print(f"Test Accuracy: {acc:.4f}")
         print(f"Best Parameters: {best_params}")
 
+# Define default arguments for DAG
+default_args = {'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME")}
+
+# Define the DAG
+dag = DAG(
+    'simple_ml_pipeline',
+    default_args=default_args,
+    description='A simple ML pipeline with three tasks',
+    schedule_interval=None,
+)
 
 # Define the tasks using PythonOperator
 extract_task = PythonOperator(

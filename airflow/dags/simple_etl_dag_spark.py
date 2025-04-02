@@ -13,15 +13,6 @@ MONGO_SPARK_TRANSFORM_COLLECTION = os.environ.get(
     "MONGO_SPARK_TRANSFORM_COLLECTION")
 MONGO_SPARK_LOAD_COLLECTION = os.environ.get("MONGO_SPARK_LOAD_COLLECTION")
 
-default_args = {'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME")}
-
-# Define the DAG
-dag = DAG(
-    'simple_etl_spark_pipeline',
-    default_args=default_args,
-    description='A simple ETL pipeline with three tasks that utilizes spark and Mongo as intermediate storage',
-    schedule_interval=None,
-)
 
 # Task 1: Fetch data from csv file
 def spark_extract():
@@ -70,6 +61,18 @@ def spark_load():
         MONGO_SPARK_ETL_DATABASE).option("collection",
                                          MONGO_SPARK_LOAD_COLLECTION).save()
 
+
+# Define default arguments for DAG
+default_args = {'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME")}
+
+# Define the DAG
+dag = DAG(
+    'simple_etl_spark_pipeline',
+    default_args=default_args,
+    description=
+    'A simple ETL pipeline with three tasks that utilizes spark and Mongo as intermediate storage',
+    schedule_interval=None,
+)
 
 # Define the tasks using PythonOperator
 fetch_data = PythonOperator(
