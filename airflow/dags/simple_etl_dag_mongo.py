@@ -88,16 +88,19 @@ dag = DAG('simple_etl_pipeline',
 extract_task = PythonOperator(
     task_id=MONGO_ETL_EXTRACT_COLLECTION,  # 'extract_data',
     python_callable=extract,
+    dag=dag
 )
 
 transform_task = PythonOperator(
     task_id=MONGO_ETL_TRANSFORM_COLLECTION,  # 'transform_data',
     python_callable=transform,
+    dag=dag
 )
 
 load_task = PythonOperator(
     task_id=MONGO_ETL_LOAD_COLLECTION,  # 'load_data',
     python_callable=load,
+    dag=dag
 )
 
 # Define task dependencies

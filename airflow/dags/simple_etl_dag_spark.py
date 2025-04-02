@@ -78,21 +78,18 @@ dag = DAG(
 fetch_data = PythonOperator(
     task_id=MONGO_SPARK_EXTRACT_COLLECTION,  #'spark_extract_data',
     python_callable=spark_extract,
-    provide_context=True,
     dag=dag,
 )
 
 transform_data = PythonOperator(
     task_id=MONGO_SPARK_TRANSFORM_COLLECTION,  #'spark_transform_data',
     python_callable=spark_transform,
-    provide_context=True,
     dag=dag,
 )
 
 train_model_task = PythonOperator(
     task_id=MONGO_SPARK_LOAD_COLLECTION,  #'spark_load_data',
     python_callable=spark_load,
-    provide_context=True,
     dag=dag,
 )
 
