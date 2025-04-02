@@ -1,7 +1,14 @@
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
+import os
 
-@dag(schedule_interval="@daily", start_date=days_ago(1), catchup=False)
+default_args = {"owner": os.environ.get("MONGO_INITDB_ROOT_USERNAME")}
+
+
+@dag(schedule_interval="@daily",
+     start_date=days_ago(1),
+     default_args=default_args,
+     catchup=False)
 def taskflow_dag():
 
     @task
@@ -20,6 +27,7 @@ def taskflow_dag():
     data = extract()
     transformed_data = transform(data)
     load(transformed_data)
+
 
 # Instantiate DAG
 taskflow_dag_instance = taskflow_dag()

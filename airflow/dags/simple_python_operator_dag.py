@@ -1,6 +1,7 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
+import os 
 
 # Define functions for tasks
 def extract(**kwargs):
@@ -17,9 +18,11 @@ def load(**kwargs):
     transformed_value = ti.xcom_pull(task_ids='transform_task')
     print(f"Loaded value: {transformed_value}")
 
+default_args = {"owner": os.environ.get("MONGO_INITDB_ROOT_USERNAME")}
 # Define DAG
 with DAG(
     "traditional_dag",
+    default_args=default_args,
     schedule_interval="@daily",
     start_date=days_ago(1),
     catchup=False,
