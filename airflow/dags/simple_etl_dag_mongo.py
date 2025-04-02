@@ -1,9 +1,10 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.mongo.hooks.mongo import MongoHook
-import pandas as pd, os
 from datetime import datetime
+import pandas as pd, os, pendulum
 
+local_tz = pendulum.timezone("Europe/Athens")
 # Define constants
 INPUT_FILE = os.environ.get("INPUT_FILE")
 MONGO_CONN_ID = os.environ.get("MONGO_CONN_ID")
@@ -74,34 +75,31 @@ def load():
 default_args = {
     'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME"),
     'depends_on_past': False,
-    'start_date': datetime(2025, 4, 1),
+    'start_date': datetime(2025, 4, 1, tzinfo=local_tz),
     'retries': 1,
 }
 
 dag = DAG('simple_etl_pipeline',
           default_args=default_args,
           description='ETL pipeline using MongoDB as intermediate storage',
-          schedule_interval='@daily',
+          schedule_interval='0 15 * * *',
           catchup=False)
 
 # Define the tasks using PythonOperator
 extract_task = PythonOperator(
     task_id=MONGO_ETL_EXTRACT_COLLECTION,  # 'extract_data',
     python_callable=extract,
-    dag=dag
-)
+    dag=dag)
 
 transform_task = PythonOperator(
     task_id=MONGO_ETL_TRANSFORM_COLLECTION,  # 'transform_data',
     python_callable=transform,
-    dag=dag
-)
+    dag=dag)
 
 load_task = PythonOperator(
     task_id=MONGO_ETL_LOAD_COLLECTION,  # 'load_data',
     python_callable=load,
-    dag=dag
-)
+    dag=dag)
 
 # Define task dependencies
 extract_task >> transform_task >> load_task

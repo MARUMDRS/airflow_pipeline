@@ -1,7 +1,10 @@
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from utils.spark import init_spark
-import os
+from datetime import datetime
+import os, pendulum
+
+local_tz = pendulum.timezone("Europe/Athens")
 
 # Define constants
 INPUT_FILE = os.environ.get("INPUT_FILE")
@@ -63,7 +66,10 @@ def spark_load():
 
 
 # Define default arguments for DAG
-default_args = {'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME")}
+default_args = {
+    'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME"),
+    'start_date': datetime(2025, 5, 1, tzinfo=local_tz),
+}
 
 # Define the DAG
 dag = DAG(
@@ -71,7 +77,7 @@ dag = DAG(
     default_args=default_args,
     description=
     'A simple ETL pipeline with three tasks that utilizes spark and Mongo as intermediate storage',
-    schedule_interval=None,
+    schedule_interval='0 8 * * 1',
 )
 
 # Define the tasks using PythonOperator
