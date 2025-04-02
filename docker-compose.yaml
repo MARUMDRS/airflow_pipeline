@@ -305,6 +305,16 @@ services:
     volumes:
       - ./mongodb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
 
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "28081:8081"
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
 
   spark:
     build: ./spark
