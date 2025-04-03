@@ -10,7 +10,7 @@ def hello_world():
 
 default_args = {'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME")}
 
-dag = DAG('hello_world_dag', default_args=default_args, schedule_interval=None)
+dag = DAG('hello_world_dag', default_args=default_args, schedule_interval="@daily")
 
 task = PythonOperator(
     task_id='say_hello',
