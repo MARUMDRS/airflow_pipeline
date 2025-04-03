@@ -192,21 +192,18 @@ dag = DAG(
 extract_task = PythonOperator(
     task_id=MONGO_ML_EXTRACT_COLLECTION,
     python_callable=extract,
-    provide_context=True,
     dag=dag,
 )
 
 preprocessing_task = PythonOperator(
     task_id=MONGO_ML_TRANSFORM_COLLECTION,
     python_callable=preprocessing,
-    provide_context=True,
     dag=dag,
 )
 
 train_model_task = PythonOperator(
     task_id=MONGO_ML_TRAIN_COLLECTION,
     python_callable=train_model,
-    provide_context=True,
     dag=dag,
 )
 

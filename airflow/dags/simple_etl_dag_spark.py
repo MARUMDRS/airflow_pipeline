@@ -17,7 +17,7 @@ MONGO_SPARK_TRANSFORM_COLLECTION = os.environ.get(
 MONGO_SPARK_LOAD_COLLECTION = os.environ.get("MONGO_SPARK_LOAD_COLLECTION")
 
 
-# Task 1: Fetch data from csv file
+# Task 1: Fetch large scale data from csv file
 def spark_extract():
     spark_session = init_spark()
     # Read data from the iris.csv file using spark
@@ -42,7 +42,7 @@ def spark_transform():
             "collection", MONGO_SPARK_EXTRACT_COLLECTION).load()
 
     # Example transformation: clean and filter data
-    ndf = df.drop('extra', "Id")  # Example cleaning
+    ndf = df.drop('extra', "Id")  # Example transformation
 
     # Save the transformed dataset to be used in the next task
     ndf.write.format("mongodb").mode("overwrite").option(
@@ -76,7 +76,7 @@ dag = DAG(
     'simple_etl_spark_pipeline',
     default_args=default_args,
     description=
-    'A simple ETL pipeline with three tasks that utilizes spark and Mongo as intermediate storage',
+    'A simple ETL pipeline with three tasks that utilizes Spark for large scale data and Mongo as intermediate storage',
     schedule_interval='0 8 * * 1',
 )
 
