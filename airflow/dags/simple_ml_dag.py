@@ -15,14 +15,17 @@ from sklearn.datasets import load_iris
 INPUT_FILE = os.environ.get("INPUT_FILE")
 MLFLOW_URI = os.environ.get("MLFLOW_URI")
 MLFLOW_EXPERIMENT_NAME = os.environ.get("MLFLOW_EXPERIMENT_NAME")
+MLFLOW_EXPERIMENT_ML_EXPL_NAME = os.environ.get(
+    "MLFLOW_EXPERIMENT_ML_EXPL_NAME")
 MONGO_CONN_ID = os.environ.get("MONGO_CONN_ID")
 MONGO_ETL_LOAD_COLLECTION = os.environ.get("MONGO_ETL_LOAD_COLLECTION")
 
 MONGO_ML_DATABASE = os.environ.get("MONGO_ML_DATABASE")
 MONGO_ML_EXTRACT_COLLECTION = os.environ.get("MONGO_ML_EXTRACT_COLLECTION")
-MONGO_ML_TRANSFORM_COLLECTION = os.environ.get(
-    "MONGO_ML_TRANSFORM_COLLECTION")
+MONGO_ML_TRANSFORM_COLLECTION = os.environ.get("MONGO_ML_TRANSFORM_COLLECTION")
 MONGO_ML_TRAIN_COLLECTION = os.environ.get("MONGO_ML_TRAIN_COLLECTION")
+MONGO_ML_EXPLAIN_COLLECTION = os.environ.get("MONGO_ML_EXPLAIN_COLLECTION")
+
 
 def save_confusion_matrix(cm, output_path):
     plt.figure(figsize=(8, 6))
@@ -34,12 +37,12 @@ def save_confusion_matrix(cm, output_path):
     plt.savefig(output_path)
     plt.close()
 
-
+# Task 1: Extract data
 def extract():
     # Read data from file
     df = pd.read_csv(INPUT_FILE)
     data = df.to_dict(orient='records')
-    
+
     # Mongo connection
     hook = MongoHook(mongo_conn_id=MONGO_CONN_ID)
     client = hook.get_conn()
@@ -50,7 +53,7 @@ def extract():
     ml_collection.delete_many({})
     ml_collection.insert_many(data)
 
-
+# Task 2: Preprocess data
 def preprocessing():
 
     # Mongo connection
@@ -62,12 +65,12 @@ def preprocessing():
     load_collection = db[MONGO_ML_EXTRACT_COLLECTION]
     data = list(load_collection.find({}))
     df = pd.DataFrame(data)
-    
+
     # Perform data transformation
     df = df.drop('Id', axis=1)  # Example cleaning
     transformed_data = df.to_dict(orient='records')
 
-    # Store tramsformed data in a collection    
+    # Store tramsformed data in a collection
     preprocessed_collection = db[MONGO_ML_TRANSFORM_COLLECTION]
     preprocessed_collection.delete_many({})
     preprocessed_collection.insert_many(transformed_data)
@@ -75,15 +78,14 @@ def preprocessing():
 
 # Task 3: Train a machine learning model
 def train_model():
+    
+    # Mongo connection
     hook = MongoHook(mongo_conn_id=MONGO_CONN_ID)
     client = hook.get_conn()
     db = client[MONGO_ML_DATABASE]
 
+    # 1. Retrieve data from the previous Step's collection
     load_collection = db[MONGO_ML_TRANSFORM_COLLECTION]
-    mlflow.set_tracking_uri(MLFLOW_URI)
-    mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
-
-    # 1. Load the Iris dataset and convert to a DataFrame
     data = pd.DataFrame(list(load_collection.find({})),
                         columns=[
                             "SepalLengthCm", "SepalWidthCm", "PetalLengthCm",
@@ -93,6 +95,10 @@ def train_model():
     print("DataFrame head:")
     print(data.head())
 
+    # Initiate MLFlow
+    mlflow.set_tracking_uri(MLFLOW_URI)
+    mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
+    
     # 2. Split the DataFrame into training and testing sets
     train_df, test_df = train_test_split(data, test_size=0.2, random_state=42)
     X_train = train_df.drop("Species", axis=1)
@@ -183,6 +189,29 @@ def train_model():
 
         print(f"Test Accuracy: {acc:.4f}")
         print(f"Best Parameters: {best_params}")
+    
+    trained_collection = db[MONGO_ML_TRAIN_COLLECTION]
+    trained_collection.delete_many({})
+    trained_collection.insert_many(data.to_dict(orient='records'))
+
+# Task 4: Explain machine learning model
+def explain_model():
+    
+    # Mongo connection
+    hook = MongoHook(mongo_conn_id=MONGO_CONN_ID)
+    client = hook.get_conn()
+    db = client[MONGO_ML_DATABASE]
+    
+    # Retrieve data from the previous Step's collection
+    load_collection = db[MONGO_ML_TRANSFORM_COLLECTION]
+    data = pd.DataFrame(list(load_collection.find({})),
+                        columns=[
+                            "SepalLengthCm", "SepalWidthCm", "PetalLengthCm",
+                            "PetalWidthCm", "Species"
+                        ])
+    
+    mlflow.set_tracking_uri(MLFLOW_URI)
+    mlflow.set_experiment(MLFLOW_EXPERIMENT_ML_EXPL_NAME)
 
 # Define default arguments for DAG
 default_args = {'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME")}
@@ -214,4 +243,10 @@ train_model_task = PythonOperator(
     dag=dag,
 )
 
-extract_task >> preprocessing_task >> train_model_task
+explain_model_task = PythonOperator(
+    task_id=MONGO_ML_EXPLAIN_COLLECTION,
+    python_callable=explain_model,
+    dag=dag,
+)
+
+extract_task >> preprocessing_task >> train_model_task >> explain_model_task
