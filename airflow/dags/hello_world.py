@@ -8,7 +8,7 @@ def hello_world():
     print("Hello, Airflow!")
 
 
-default_args = {'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME"), 'start_date': datetime(2025, 3, 1)}
+default_args = {'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME"), 'start_date': datetime(2025, 4, 1)}
 
 dag = DAG('hello_world_dag', default_args=default_args, schedule_interval="@daily")
 
