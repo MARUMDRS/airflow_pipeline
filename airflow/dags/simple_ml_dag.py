@@ -36,30 +36,38 @@ def save_confusion_matrix(cm, output_path):
 
 
 def extract():
+    # Read data from file
     df = pd.read_csv(INPUT_FILE)
     data = df.to_dict(orient='records')
+    
+    # Mongo connection
     hook = MongoHook(mongo_conn_id=MONGO_CONN_ID)
     client = hook.get_conn()
     db = client[MONGO_ML_DATABASE]
 
+    # Store extracted data in a collection
     ml_collection = db[MONGO_ML_EXTRACT_COLLECTION]
     ml_collection.delete_many({})
     ml_collection.insert_many(data)
 
 
 def preprocessing():
+
+    # Mongo connection
     hook = MongoHook(mongo_conn_id=MONGO_CONN_ID)
     client = hook.get_conn()
     db = client[MONGO_ML_DATABASE]
 
+    # Retrieve data from the previous Step's collection
     load_collection = db[MONGO_ML_EXTRACT_COLLECTION]
     data = list(load_collection.find({}))
-
     df = pd.DataFrame(data)
-    df = df.drop('Id', axis=1)  # Example cleaning
-
-    transformed_data = df.to_dict(orient='records')
     
+    # Perform data transformation
+    df = df.drop('Id', axis=1)  # Example cleaning
+    transformed_data = df.to_dict(orient='records')
+
+    # Store tramsformed data in a collection    
     preprocessed_collection = db[MONGO_ML_TRANSFORM_COLLECTION]
     preprocessed_collection.delete_many({})
     preprocessed_collection.insert_many(transformed_data)
@@ -82,7 +90,6 @@ def train_model():
                             "PetalWidthCm", "Species"
                         ])
 
-    # data["Species"] = iris.target
     print("DataFrame head:")
     print(data.head())
 

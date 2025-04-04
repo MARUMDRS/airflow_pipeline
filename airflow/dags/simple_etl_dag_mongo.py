@@ -6,24 +6,27 @@ import pandas as pd, os, pendulum
 
 local_tz = pendulum.timezone("Europe/Athens")
 # Define constants
-INPUT_FILE = os.environ.get("INPUT_FILE")
-MONGO_CONN_ID = os.environ.get("MONGO_CONN_ID")
-MONGO_ETL_DATABASE = os.environ.get("MONGO_ETL_DATABASE")
-MONGO_ETL_EXTRACT_COLLECTION = os.environ.get("MONGO_ETL_EXTRACT_COLLECTION")
+INPUT_FILE = os.environ.get("INPUT_FILE") # The path to the input file defined through environment variable (.env)
+MONGO_CONN_ID = os.environ.get("MONGO_CONN_ID") # Mongo connection id defined through environment variable (.env)
+MONGO_ETL_DATABASE = os.environ.get("MONGO_ETL_DATABASE") # Mongo Database defined through environment variable (.env)
+MONGO_ETL_EXTRACT_COLLECTION = os.environ.get("MONGO_ETL_EXTRACT_COLLECTION") # Mongo Collection for "extract" step defined through environment variable (.env)
 MONGO_ETL_TRANSFORM_COLLECTION = os.environ.get(
-    "MONGO_ETL_TRANSFORM_COLLECTION")
-MONGO_ETL_LOAD_COLLECTION = os.environ.get("MONGO_ETL_LOAD_COLLECTION")
+    "MONGO_ETL_TRANSFORM_COLLECTION") # Mongo Collection for "tramsform" step defined through environment variable (.env)
+MONGO_ETL_LOAD_COLLECTION = os.environ.get("MONGO_ETL_LOAD_COLLECTION") # Mongo Collection for "load" step defined through environment variable (.env)
 
 
-def extract():
+def extract(): 
     """Extract data from CSV and store in MongoDB."""
+    # Read data from file
     df = pd.read_csv(INPUT_FILE)
     data = df.to_dict(orient='records')
+    
+    # Mongo connection
     hook = MongoHook(mongo_conn_id=MONGO_CONN_ID)
     client = hook.get_conn()
     db = client[MONGO_ETL_DATABASE]
 
-    # Store extracted data
+    # Store extracted data in a collection
     collection = db[MONGO_ETL_EXTRACT_COLLECTION]
     collection.delete_many({})
     collection.insert_many(data)
@@ -33,19 +36,22 @@ def extract():
 
 def transform():
     """Retrieve extracted data from MongoDB, transform it, and store back."""
+    # Mongo connection
     hook = MongoHook(mongo_conn_id=MONGO_CONN_ID)
     client = hook.get_conn()
     db = client[MONGO_ETL_DATABASE]
 
+    # Retrieve data from the previous Step's collection
     extract_collection = db[MONGO_ETL_EXTRACT_COLLECTION]
-    transform_collection = db[MONGO_ETL_TRANSFORM_COLLECTION]
-
     data = list(extract_collection.find({}))  # Retrieve extracted data
-
     df = pd.DataFrame(data)
-    df = df.drop('Id', axis=1)  # Example cleaning
-
+    
+    # Perform data transformation
+    df = df.drop('Id', axis=1)
     transformed_data = df.to_dict(orient='records')
+
+    # Store tramsformed data in a collection
+    transform_collection = db[MONGO_ETL_TRANSFORM_COLLECTION]
     transform_collection.delete_many({})
     transform_collection.insert_many(transformed_data)
 
@@ -56,14 +62,17 @@ def transform():
 
 def load():
     """Retrieve transformed data from MongoDB and insert into final collection."""
+    # Mongo connection
     hook = MongoHook(mongo_conn_id=MONGO_CONN_ID)
     client = hook.get_conn()
     db = client[MONGO_ETL_DATABASE]
 
+    # Retrieve transformed data from the previous Step's collection
     transform_collection = db[MONGO_ETL_TRANSFORM_COLLECTION]
-    final_collection = db[MONGO_ETL_LOAD_COLLECTION]
-
     data = list(transform_collection.find({}))  # Retrieve transformed data
+    
+    # Store transformed data in the final collection
+    final_collection = db[MONGO_ETL_LOAD_COLLECTION]
     final_collection.delete_many({})
     final_collection.insert_many(data)
     print(
@@ -79,6 +88,7 @@ default_args = {
     'retries': 1,
 }
 
+# Define the DAG
 dag = DAG('simple_etl_pipeline',
           default_args=default_args,
           description='ETL pipeline using MongoDB as intermediate storage',

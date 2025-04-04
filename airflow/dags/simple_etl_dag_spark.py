@@ -7,25 +7,37 @@ import os, pendulum
 local_tz = pendulum.timezone("Europe/Athens")
 
 # Define constants
-INPUT_FILE = os.environ.get("INPUT_FILE")
-MONGO_CONN_ID = os.environ.get("MONGO_CONN_ID")
-MONGO_SPARK_ETL_DATABASE = os.environ.get("MONGO_SPARK_ETL_DATABASE")
+INPUT_FILE = os.environ.get(
+    "INPUT_FILE"
+)  # The path to the input file defined through environment variable (.env)
+MONGO_CONN_ID = os.environ.get(
+    "MONGO_CONN_ID"
+)  # Mongo connection id defined through environment variable (.env)
+MONGO_SPARK_ETL_DATABASE = os.environ.get(
+    "MONGO_SPARK_ETL_DATABASE"
+)  # Mongo Database defined through environment variable (.env)
 MONGO_SPARK_EXTRACT_COLLECTION = os.environ.get(
-    "MONGO_SPARK_EXTRACT_COLLECTION")
+    "MONGO_SPARK_EXTRACT_COLLECTION"
+)  # Mongo Collection for "extract" step defined through environment variable (.env)
 MONGO_SPARK_TRANSFORM_COLLECTION = os.environ.get(
-    "MONGO_SPARK_TRANSFORM_COLLECTION")
-MONGO_SPARK_LOAD_COLLECTION = os.environ.get("MONGO_SPARK_LOAD_COLLECTION")
+    "MONGO_SPARK_TRANSFORM_COLLECTION"
+)  # Mongo Collection for "tramsform" step defined through environment variable (.env)
+MONGO_SPARK_LOAD_COLLECTION = os.environ.get(
+    "MONGO_SPARK_LOAD_COLLECTION"
+)  # Mongo Collection for "load" step defined through environment variable (.env)
 
 
 # Task 1: Fetch large scale data from csv file
 def spark_extract():
+    # Initiate Spark session
     spark_session = init_spark()
-    # Read data from the iris.csv file using spark
+
+    # Read data from file using spark
     df = spark_session.read.options(delimiter=",",
                                     header=True,
                                     inferSchema=True).csv(INPUT_FILE)
 
-    # Save the dataset in mongodb to be used in the next tasks
+    # Store extracted data in a collection
     df.write.format("mongodb").mode("overwrite").option(
         "database", MONGO_SPARK_ETL_DATABASE).option(
             "collection", MONGO_SPARK_EXTRACT_COLLECTION).save()
@@ -33,18 +45,18 @@ def spark_extract():
 
 # Task 2: Data transformation
 def spark_transform():
-    # Start spark session
+    # Initiate Spark session
     spark_session = init_spark()
 
-    # Fetch dataset from the previous task
+    # Retrieve data from the previous Step's collection
     df = spark_session.read.format("mongodb").option(
         "database", MONGO_SPARK_ETL_DATABASE).option(
             "collection", MONGO_SPARK_EXTRACT_COLLECTION).load()
 
-    # Example transformation: clean and filter data
-    ndf = df.drop('extra', "Id")  # Example transformation
+    # Perform data transformation
+    ndf = df.drop('extra', "Id")
 
-    # Save the transformed dataset to be used in the next task
+    # Store tramsformed data in a collection
     ndf.write.format("mongodb").mode("overwrite").option(
         "database", MONGO_SPARK_ETL_DATABASE).option(
             "collection", MONGO_SPARK_TRANSFORM_COLLECTION).save()
@@ -52,13 +64,15 @@ def spark_transform():
 
 # Task 3: Train a machine learning model
 def spark_load():
+    # Initiate Spark session
     spark_session = init_spark()
-    # Fetch dataset from the previous task
+    
+    # Retrieve transformed data from the previous Step's collection
     df = spark_session.read.format("mongodb").option(
         "database", MONGO_SPARK_ETL_DATABASE).option(
             "collection", MONGO_SPARK_TRANSFORM_COLLECTION).load()
 
-    # Save the transformed dataset to be used in the next task
+    # Store transformed data in the final collection
     df.write.format("mongodb").mode("overwrite").option(
         "database",
         MONGO_SPARK_ETL_DATABASE).option("collection",
@@ -82,19 +96,19 @@ dag = DAG(
 
 # Define the tasks using PythonOperator
 fetch_data = PythonOperator(
-    task_id=MONGO_SPARK_EXTRACT_COLLECTION,  #'spark_extract_data',
+    task_id=MONGO_SPARK_EXTRACT_COLLECTION,  # 'spark_extract_data',
     python_callable=spark_extract,
     dag=dag,
 )
 
 transform_data = PythonOperator(
-    task_id=MONGO_SPARK_TRANSFORM_COLLECTION,  #'spark_transform_data',
+    task_id=MONGO_SPARK_TRANSFORM_COLLECTION,  # 'spark_transform_data',
     python_callable=spark_transform,
     dag=dag,
 )
 
 train_model_task = PythonOperator(
-    task_id=MONGO_SPARK_LOAD_COLLECTION,  #'spark_load_data',
+    task_id=MONGO_SPARK_LOAD_COLLECTION,  # 'spark_load_data',
     python_callable=spark_load,
     dag=dag,
 )
