@@ -290,58 +290,8 @@ task_3 = PythonOperator(
     dag=dag
 )
 
-# Set task dependencies
-task_1 >> task_2 >> task_3
-```
-
-```python
-from airflow import DAG
-from airflow.operators.python import PythonOperator
-from datetime import datetime
 
 
-default_args = {
-    'owner': 'airflow',
-
-}
-
-dag = DAG(
-    dag_id='simple_etl_pipeline_in_Airflow',
-    default_args=default_args,
-    description='Simple ETL pipeline in Airflow',
-
-)
-
-# Task Operator Functions
-def extract(**kwargs):
-    # Read data from a source
-
-def transform(**kwargs):
-    # Apply data transformations
-
-def load(**kwargs):
-    # Load data into another source
-
-task_1 = PythonOperator(
-    task_id='extract',
-    python_callable=extract,
-    dag=dag
-)
-
-task_2 = PythonOperator(
-    task_id='transform',
-    python_callable=transform,
-    dag=dag
-)
-
-task_3 = PythonOperator(
-    task_id="load",
-    python_callable=load,
-    dag=dag
-)
-
-# Set task dependencies
-task_1 >> task_2 >> task_3
 ```
 
 ```python
@@ -392,4 +342,54 @@ task_3 = PythonOperator(
 
 
 
+```
+
+```python
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime
+
+
+default_args = {
+    'owner': 'airflow',
+
+}
+
+dag = DAG(
+    dag_id='simple_etl_pipeline_in_Airflow',
+    default_args=default_args,
+    description='Simple ETL pipeline in Airflow',
+
+)
+
+# Task Operator Functions
+def extract(**kwargs):
+    # Read data from a source
+
+def transform(**kwargs):
+    # Apply data transformations
+
+def load(**kwargs):
+    # Load data into another source
+
+task_1 = PythonOperator(
+    task_id='extract',
+    python_callable=extract,
+    dag=dag
+)
+
+task_2 = PythonOperator(
+    task_id='transform',
+    python_callable=transform,
+    dag=dag
+)
+
+task_3 = PythonOperator(
+    task_id="load",
+    python_callable=load,
+    dag=dag
+)
+
+# Set task dependencies
+task_1 >> task_2 >> task_3
 ```
