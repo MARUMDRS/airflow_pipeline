@@ -68,6 +68,8 @@ def preprocessing():
 
     # Perform data transformation
     df = df.drop('Id', axis=1)  # Example cleaning
+    # df[species] cast to 0, 1
+    df['Species'] = df['Species'].astype('category').cat.codes
     transformed_data = df.to_dict(orient='records')
 
     # Store tramsformed data in a collection
@@ -125,7 +127,7 @@ def train_model():
                                    param_grid,
                                    cv=3,
                                    scoring='accuracy')
-        grid_search.fit(X_train, y_train)
+        grid_search.fit(X_train.to_numpy(), y_train.to_numpy())
 
         # Create a child run for each hyperparameter candidate from cv_results_
         for idx, params in enumerate(grid_search.cv_results_["params"]):
@@ -146,7 +148,8 @@ def train_model():
         mlflow.log_params(best_params)
 
         # 5. Evaluate the best model on the test set
-        predictions = best_model.predict(X_test)
+        predictions = best_model.predict(X_test.to_numpy())
+        y_test = y_test.to_numpy()
         acc = accuracy_score(y_test, predictions)
         mlflow.log_metric("accuracy", acc)
 
@@ -164,24 +167,24 @@ def train_model():
         mlflow.log_artifact(report_path, artifact_path="evaluation")
 
         # 6. Log the model with signature and input example
-        signature = infer_signature(X_test, best_model.predict(X_test))
+        signature = infer_signature(X_test.to_numpy(), best_model.predict(X_test.to_numpy()))
         mlflow.sklearn.log_model(
             sk_model=best_model,
             artifact_path="iris_rf_model",
             signature=signature,
-            input_example=X_test,  # Example input for the model
-            # registered_model_name="iris_rf_model"  # Uncomment to register the model
+            input_example=X_test.to_numpy(),  # Example input for the model
+            registered_model_name="iris_rf_model"  # Uncomment to register the model
         )
         model_uri = mlflow.get_artifact_uri("iris_rf_model")
 
-        # 7. Automatic Evaluation using mlflow.evaluate
-        eval_results = mlflow.evaluate(
-            model=model_uri,
-            data=test_df,
-            targets="Species",
-            model_type="classifier",
-            # evaluators=["default"],
-        )
+        # # 7. Automatic Evaluation using mlflow.evaluate
+        # eval_results = mlflow.evaluate(
+        #     model=model_uri,
+        #     data=test_df,
+        #     targets="Species",
+        #     model_type="classifier",
+        #     # evaluators=["default"],
+        # )
 
         # 8. Set additional metadata tags
         mlflow.set_tag("model_type", "RandomForestClassifier")
@@ -211,7 +214,40 @@ def explain_model():
                         ])
     
     mlflow.set_tracking_uri(MLFLOW_URI)
-    mlflow.set_experiment(MLFLOW_EXPERIMENT_ML_EXPL_NAME)
+    mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
+
+    model_name = "iris_rf_model"
+    model_version = "latest"
+
+    # Load the model from the Model Registry
+    model_uri = f"models:/{model_name}/{model_version}"
+    loaded_model = mlflow.sklearn.load_model(model_uri)
+
+    import effector
+    data = data.drop("Species", axis=1)
+    print(data.to_numpy().shape)
+    print(data.to_numpy()[:10])
+    print(loaded_model.predict_proba(data.to_numpy())[:10])
+
+    target_names = ["setosa","versicolor", "virginica"]
+    for i in range(3):
+        def predict_f(X):
+            return loaded_model.predict_proba(X)[:, i]
+        pdp = effector.PDP(data.to_numpy(), predict_f, feature_names=data.columns.tolist(), target_name=target_names[i])
+        for feature in [0, 1, 2, 3]:
+            fig, ax = pdp.plot(feature=feature, y_limits=[-0.4, 0.4], show_plot=False)
+
+            # storeg fig as png image in artifacts
+            fig.savefig("pdp_plot_feature_{}_target_{}.png".format(feature, i))
+            mlflow.log_artifact("pdp_plot_feature_{}_target_{}.png".format(feature, i), artifact_path="explanations")
+
+    # predictions = loaded_model.predict(data.drop("Species", axis=1))
+
+    # # log the predictions
+    # data["Predictions"] = predictions
+    # data.to_csv("predictions.csv", index=False)
+    # mlflow.log_artifact("predictions.csv", artifact_path="predictions")
+
 
 # Define default arguments for DAG
 default_args = {'owner': os.environ.get("MONGO_INITDB_ROOT_USERNAME")}
