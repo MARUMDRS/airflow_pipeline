@@ -218,6 +218,7 @@ def explain_model():
 
     model_name = "iris_rf_model"
     model_version = "latest"
+    run_name = "explain_model"
 
     # Load the model from the Model Registry
     model_uri = f"models:/{model_name}/{model_version}"
@@ -229,24 +230,18 @@ def explain_model():
     print(data.to_numpy()[:10])
     print(loaded_model.predict_proba(data.to_numpy())[:10])
 
-    target_names = ["setosa","versicolor", "virginica"]
-    for i in range(3):
-        def predict_f(X):
-            return loaded_model.predict_proba(X)[:, i]
-        pdp = effector.PDP(data.to_numpy(), predict_f, feature_names=data.columns.tolist(), target_name=target_names[i])
-        for feature in [0, 1, 2, 3]:
-            fig, ax = pdp.plot(feature=feature, y_limits=[-0.4, 0.4], show_plot=False)
+    with mlflow.start_run(run_name=run_name) as run:
+        target_names = ["setosa","versicolor", "virginica"]
+        for i in range(3):
+            def predict_f(X):
+                return loaded_model.predict_proba(X)[:, i]
+            pdp = effector.PDP(data.to_numpy(), predict_f, feature_names=data.columns.tolist(), target_name=target_names[i])
+            for feature in [0, 1, 2, 3]:
+                fig, ax = pdp.plot(feature=feature, y_limits=[-0.4, 0.4], show_plot=False)
 
-            # storeg fig as png image in artifacts
-            fig.savefig("pdp_plot_feature_{}_target_{}.png".format(feature, i))
-            mlflow.log_artifact("pdp_plot_feature_{}_target_{}.png".format(feature, i), artifact_path="explanations")
-
-    # predictions = loaded_model.predict(data.drop("Species", axis=1))
-
-    # # log the predictions
-    # data["Predictions"] = predictions
-    # data.to_csv("predictions.csv", index=False)
-    # mlflow.log_artifact("predictions.csv", artifact_path="predictions")
+                # storeg fig as png image in artifacts
+                fig.savefig("pdp_plot_feature_{}_target_{}.png".format(feature, i))
+                mlflow.log_artifact("pdp_plot_feature_{}_target_{}.png".format(feature, i), artifact_path="explanations")
 
 
 # Define default arguments for DAG
