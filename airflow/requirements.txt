@@ -5,3 +5,4 @@ pandas==2.2.3
 apache-airflow-providers-mongo
 seaborn
 effector
+shapiq
