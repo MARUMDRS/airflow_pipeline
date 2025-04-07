@@ -4,4 +4,4 @@ mlflow==2.16.2
 pandas==2.2.3
 apache-airflow-providers-mongo
 seaborn
-effector @ git+https://github.com/givasile/effector.git@e36838e0f904e5a79c535e565cd65e8b5c553935
+effector @ git+https://github.com/givasile/effector.git@dfdf4d4b59819219fbee2abe9ac3b2b7ac91f1ba
