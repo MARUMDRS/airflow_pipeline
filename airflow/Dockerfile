@@ -45,6 +45,8 @@ RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*    
 ENV JAVA_HOME=/usr/lib/jvm/jdk-17.0.12/
 ENV PATH="/usr/lib/jvm/jdk-17.0.12/bin:${PATH}"
 
+RUN apt-get update && apt-get install -y git-all
+
 USER airflow
 COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
