@@ -2,7 +2,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.mongo.hooks.mongo import MongoHook
 from datetime import datetime
-import pandas as pd, os, pendulum
+import pandas as pd, os, pendulum, effector
 
 local_tz = pendulum.timezone("Europe/Athens")
 # Define constants
