@@ -41,7 +41,7 @@ class GithubCrawler:
             repo_full_name = repo.full_name
 
             if repo_full_name in downloaded_repos:
-                logging.info(f"⏭️  Already downloaded {repo_full_name}. Skipping.")
+                logging.info(f"Already downloaded {repo_full_name}. Skipping.")
                 continue
 
             repo_url = repo.clone_url
@@ -55,7 +55,7 @@ class GithubCrawler:
                 logging.warning(f"Failed to clone {repo_url}. Skipping.")
                 continue
 
-            logging.info(f"✅ Saved {repo_name}")
+            logging.info(f"Saved {repo_name}")
             save_downloaded_repo(repo_full_name)
             downloaded_repos.add(repo_full_name)
 
