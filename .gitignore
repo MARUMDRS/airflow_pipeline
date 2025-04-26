@@ -180,4 +180,4 @@ airflow/logs/*
 airflow/plugins/*
 !airflow/plugins/.gitkeep
 
-examples.md
+examples.md"tests_file/.env" 
