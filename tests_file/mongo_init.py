@@ -19,7 +19,7 @@ def initialize_mongodb():
         "owner": "dummy_user",
         "stars": 0,
         "clone_url": "https://github.com/dummy_user/dummy-repo.git",
-        "has_pandas": None,
+        "has_pandas": False,
         "is_downloaded": False,
         "is_run": False,
         "dataset_name": None
