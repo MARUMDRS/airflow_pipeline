@@ -1,35 +1,26 @@
+
 import os
 import time
 import logging
 from github import Github, GithubException
-from config import GITHUB_TOKEN, TARGET_REPO_COUNT, SAVE_DIR, SEARCH_QUERY
-from utils import clone_repo
-
-def load_downloaded_repos(file_path="downloaded_repos.txt"):
-    """Load the set of previously downloaded repository full names."""
-    if os.path.exists(file_path):
-        with open(file_path, "r") as f:
-            return set(line.strip() for line in f.readlines())
-    return set()
-
-def save_downloaded_repo(repo_full_name, file_path="downloaded_repos.txt"):
-    """Save a new successfully downloaded repository full name."""
-    with open(file_path, "a") as f:
-        f.write(repo_full_name + "\n")
+from pymongo import MongoClient
+from config import GITHUB_TOKEN, TARGET_REPO_COUNT, SAVE_DIR, SEARCH_QUERY, MONGO_URL, MONGO_DB, MONGO_COLLECTION
+from utils import clone_repo, notebook_contains_pandas, delete_repo
+from repository import Repository
 
 class GithubCrawler:
     def __init__(self):
         self.client = Github(GITHUB_TOKEN)
+        self.mongo_client = MongoClient(MONGO_URL)
+        self.db = self.mongo_client[MONGO_DB]
+        self.collection = self.db[MONGO_COLLECTION]
         os.makedirs(SAVE_DIR, exist_ok=True)
 
     def crawl(self):
         saved_repos = 0
-        downloaded_repos = load_downloaded_repos()
-
         try:
             results = self.client.search_repositories(query=SEARCH_QUERY, sort="stars", order="desc")
             logging.info(f"Found {results.totalCount} repositories matching query.")
-
         except GithubException as e:
             logging.error(f"GitHub API error: {e}")
             return
@@ -38,26 +29,43 @@ class GithubCrawler:
             if saved_repos >= TARGET_REPO_COUNT:
                 break
 
-            repo_full_name = repo.full_name
-
-            if repo_full_name in downloaded_repos:
-                logging.info(f"⏭️  Already downloaded {repo_full_name}. Skipping.")
-                continue
-
             repo_url = repo.clone_url
             repo_name = repo.name
-            save_path = os.path.join(SAVE_DIR, repo_name)
+            final_save_path = os.path.join(SAVE_DIR, repo_name)
 
-            logging.info(f"Cloning {repo_url}...")
-            success = clone_repo(repo_url, save_path)
+            if os.path.exists(final_save_path):
+                logging.info(f"⏭️  {repo_name} already exists locally. Skipping clone.")
+                continue
+
+            logging.info(f"Cloning {repo_url} into {final_save_path}...")
+            success = clone_repo(repo_url, final_save_path)
 
             if not success:
                 logging.warning(f"Failed to clone {repo_url}. Skipping.")
                 continue
 
-            logging.info(f"✅ Saved {repo_name}")
-            save_downloaded_repo(repo_full_name)
-            downloaded_repos.add(repo_full_name)
+            found_pandas = False
+            for root, dirs, files in os.walk(final_save_path):
+                for file in files:
+                    if file.endswith(".ipynb"):
+                        if notebook_contains_pandas(os.path.join(root, file)):
+                            found_pandas = True
+                            break
+                if found_pandas:
+                    break
 
-            saved_repos += 1
-            time.sleep(1)  
+            if found_pandas:
+                logging.info(f"✅ Found pandas in {repo_name}. Saving to MongoDB.")
+                repo_object = Repository(repo)
+                repo_object.has_pandas = True
+                repo_object.is_downloaded = True
+                repo_object.directory_path = final_save_path
+                self.collection.update_one({"_id": repo_object.full_name}, {"$setOnInsert": repo_object.to_dict()}, upsert=True)
+                saved_repos += 1
+            else:
+                logging.info(f"❌ No pandas in {repo_name}. Deleting...")
+                delete_repo(final_save_path)
+
+            time.sleep(1)
+
+        logging.info(f"✅ Crawling completed. Saved {saved_repos} repositories with pandas.")

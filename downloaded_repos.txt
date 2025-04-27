@@ -1,0 +1,15 @@
+w3cdpass/notebook-ed
+BAMresearch/jupyter-integration
+hoangnv735/ipynb-viewer-firefox
+sainathadapa/auto-redirect-nbviewer
+sander-ali/segment_images_with_SAM2
+Leytton/vsc-jupyter-to-markdown
+AlexMadrid-coder/I-pAI
+RitualIced/Instagram-spammer-
+gusgusta123/gustacoins
+Pooja-Singh-18/Python_course
+lg/lgscratchpad
+miguelmarco/jupyterlab-fileconvert
+theArjun/notebookify
+iancadev/apma4300-style-highlighter
+biswajitSM/directory-wise-tasks

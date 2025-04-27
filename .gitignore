@@ -1,3 +1,7 @@
+
+/github_repos
+kaggle.json
+.env.local
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

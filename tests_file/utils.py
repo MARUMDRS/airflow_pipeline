@@ -1,14 +1,14 @@
 import os
 import shutil
-import nbformat
 import stat
+import nbformat
 from git import Repo
 
 def clone_repo(repo_url, save_path):
     try:
         Repo.clone_from(repo_url, save_path)
         return True
-    except Exception as e:
+    except Exception:
         return False
 
 def notebook_contains_pandas(notebook_path):
@@ -23,11 +23,9 @@ def notebook_contains_pandas(notebook_path):
         pass
     return False
 
-def handle_remove_readonly(func, path, exc_info):
-    """Clear the readonly bit and retry the removal."""
-    os.chmod(path, stat.S_IWRITE)
-    func(path)
-
 def delete_repo(path):
     if os.path.exists(path):
-        shutil.rmtree(path, onerror=handle_remove_readonly)
+        def on_rm_error(func, path, exc_info):
+            os.chmod(path, stat.S_IWRITE)
+            func(path)
+        shutil.rmtree(path, onerror=on_rm_error)
