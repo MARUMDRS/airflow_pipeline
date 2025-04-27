@@ -5,3 +5,7 @@ pandas==2.2.3
 apache-airflow-providers-mongo
 seaborn
 effector @ git+https://github.com/givasile/effector.git@dfdf4d4b59819219fbee2abe9ac3b2b7ac91f1ba
+PyGithub
+pymongo
+gitpython
+nbformat
