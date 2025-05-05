@@ -42,4 +42,3 @@ def process_repository(repo_data):
     shutil.rmtree(temp_path, ignore_errors=True)
     logger.info("No pandas in %s. Deleted.", repo_name)
     return None
-
