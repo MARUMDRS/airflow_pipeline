@@ -1,7 +1,7 @@
 import os
 import shutil
 import logging
-from github_crawler.config import SAVE_DIR
+from github_crawler.config import SAVE_DIR, GITHUB_TOKEN
 from github_crawler.utils import clone_repo, notebook_contains_pandas
 from github_crawler.repository import Repository
 from github_crawler.mongo_handler import save_repository
@@ -13,7 +13,7 @@ def process_repository(repo_data):
     repo_name = repo_data["name"]
     owner = repo_data["owner"]["login"]
 
-    temp_path = os.path.join(SAVE_DIR, "temp_repo")
+    temp_path = os.path.join(SAVE_DIR, f"temp_repo_{repo_name}")
     final_path = os.path.join(SAVE_DIR, repo_name)
 
     if os.path.exists(final_path):
@@ -26,7 +26,6 @@ def process_repository(repo_data):
     if not clone_repo(repo_url, temp_path):
         logger.warning("Failed to clone %s. Skipping.", repo_url)
         return None
-
 
     for root, _, files in os.walk(temp_path):
         for file in files:
@@ -43,3 +42,4 @@ def process_repository(repo_data):
     shutil.rmtree(temp_path, ignore_errors=True)
     logger.info("No pandas in %s. Deleted.", repo_name)
     return None
+
