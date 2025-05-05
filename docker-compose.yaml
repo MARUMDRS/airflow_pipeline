@@ -311,7 +311,7 @@ services:
       - 27017:27017
     volumes:
       - ./mongodb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
-
+      - mongodb-data:/data/db                        
   mongo-express:
     image: mongo-express
     container_name: mongo-express
@@ -362,3 +362,4 @@ services:
 volumes:
   postgres-db-volume:
   mlflow-volume:
+  mongodb-data: 
