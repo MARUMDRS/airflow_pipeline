@@ -1,0 +1,12 @@
++------------------+----------------------------+-----------------------------+
+| Container        | URL / Host:Port           | Username      | Password    |
++------------------+----------------------------+-----------------------------+
+| Airflow Web UI   | http://localhost:8080      | airflow        | airflow     |
+| Flower UI        | http://localhost:5555      | N/A            | N/A         |
+| MLflow UI        | http://localhost:5000      | N/A            | N/A         |
+| Mongo Express    | http://localhost:28081     | seminar        | seminar     |
+| PostgreSQL       | localhost:5432 (internal)  | airflow        | airflow     |
+| Redis            | localhost:6379 (internal)  | N/A            | N/A         |
+| MongoDB          | mongodb://mongodb:27017    | root           | example     |
+| Spark Master     | http://localhost:8090      | N/A            | N/A         |
++------------------+----------------------------+-----------------------------+

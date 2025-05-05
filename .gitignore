@@ -2,6 +2,12 @@
 /github_repos
 kaggle.json
 .env.local
+# .env secrets
+.env.local
+
+# repo downloads
+github_repos/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
