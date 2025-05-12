@@ -5,6 +5,8 @@ kaggle.json
 # .env secrets
 .env.local
 
+# kaggle token
+kaggle.json
 # repo downloads
 github_repos/
 

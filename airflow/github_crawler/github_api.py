@@ -76,7 +76,7 @@ def fetch_github_repositories():
 
             if has_next_page and new_cursor:
                 end_cursor = new_cursor
-                save_cursor(end_cursor)  # save for next DAG run
+                save_cursor(end_cursor)  
                 logger.info(f"Saved pagination cursor: {end_cursor}")
             else:
                 logger.info("Final page reached or no cursor available.")

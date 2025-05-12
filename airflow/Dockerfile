@@ -45,6 +45,10 @@ RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*    
 ENV JAVA_HOME=/usr/lib/jvm/jdk-17.0.12/
 ENV PATH="/usr/lib/jvm/jdk-17.0.12/bin:${PATH}"
 
+# Create .kaggle directory and add kaggle.json file
+COPY kaggle.json /root/.kaggle/kaggle.json
+RUN chmod 600 /root/.kaggle/kaggle.json
+
 RUN apt-get update && apt-get install -y git-all
 
 USER airflow
