@@ -48,7 +48,7 @@ def find_dataset_in_repo(repo_path: Path, filename: str) -> Path | None:
     try:
         matches = list(repo_path.rglob(filename))
         if matches:
-            logger.info(f"Found dataset '{filename}' in repo {repo_path}")
+            logger.info(f"Found dataset '{filename}' at: {matches[0].relative_to(repo_path)} in repo {repo_path}")
             return matches[0]
         else:
             logger.debug(f"'{filename}' not found in repo {repo_path}")

@@ -46,11 +46,19 @@ ENV JAVA_HOME=/usr/lib/jvm/jdk-17.0.12/
 ENV PATH="/usr/lib/jvm/jdk-17.0.12/bin:${PATH}"
 
 # Create .kaggle directory and add kaggle.json file
-COPY kaggle.json /root/.kaggle/kaggle.json
+COPY ../kaggle.json /root/.kaggle/kaggle.json
 RUN chmod 600 /root/.kaggle/kaggle.json
 
-RUN apt-get update && apt-get install -y git-all
+#RUN apt-get update && apt-get install -y git-all
+# Install Git, unzip, pip, and Kaggle CLI
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git-all \
+    unzip \
+    python3-pip \
+ && pip install --no-cache-dir kaggle \
+ && rm -rf /var/lib/apt/lists/*
 
+ 
 USER airflow
 COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

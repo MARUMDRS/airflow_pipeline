@@ -83,6 +83,8 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-./airflow}/plugins:/opt/airflow/plugins
     # Add git_hub_crawler to the volumes to be able to run it in the container
     - ${AIRFLOW_PROJ_DIR:-./airflow}/github_crawler:/opt/airflow/github_crawler
+    - ${AIRFLOW_PROJ_DIR:-./airflow}/dataset_retriever:/opt/airflow/dataset_retriever
+     
     - ${AIRFLOW_PROJ_DIR:-./airflow}/../github_repos:/opt/airflow/github_repos
 
   user: "${AIRFLOW_UID:-50000}:0"
