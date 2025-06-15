@@ -1,0 +1,16 @@
+{
+  "op": "unstack",
+  "args": {
+    "obj": {
+      "type": "Series",
+      "dtype": "object",
+      "length": 24
+    },
+    "level": [
+      0,
+      1
+    ],
+    "fill_value": null,
+    "sort": true
+  }
+}

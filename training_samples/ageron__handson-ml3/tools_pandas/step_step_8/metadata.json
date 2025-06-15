@@ -1,0 +1,17 @@
+{
+  "op": "unstack",
+  "args": {
+    "self": {
+      "type": "Series",
+      "dtype": "object",
+      "length": 24
+    },
+    "level": [
+      0,
+      1
+    ],
+    "fill_value": null,
+    "sort": true
+  },
+  "raw_code": "def unstack("
+}

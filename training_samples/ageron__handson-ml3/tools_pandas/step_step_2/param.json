@@ -1,0 +1,15 @@
+{
+  "op": "unstack",
+  "args": {
+    "obj": {
+      "type": "DataFrame",
+      "shape": [
+        10,
+        2
+      ]
+    },
+    "level": -1,
+    "fill_value": null,
+    "sort": true
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "op": "stack",
+  "args": {
+    "frame": {
+      "type": "DataFrame",
+      "shape": [
+        4,
+        3
+      ]
+    },
+    "level": -1,
+    "dropna": true,
+    "sort": true
+  }
+}

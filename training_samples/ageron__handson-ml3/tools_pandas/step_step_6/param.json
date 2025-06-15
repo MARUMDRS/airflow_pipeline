@@ -1,0 +1,13 @@
+{
+  "op": "unstack",
+  "args": {
+    "self": {
+      "type": "Series",
+      "dtype": "object",
+      "length": 24
+    },
+    "level": "__placeholder__",
+    "fill_value": null,
+    "sort": true
+  }
+}

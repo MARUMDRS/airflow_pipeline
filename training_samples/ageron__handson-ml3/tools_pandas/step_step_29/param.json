@@ -1,0 +1,33 @@
+{
+  "op": "merge",
+  "args": {
+    "left": {
+      "type": "DataFrame",
+      "shape": [
+        5,
+        4
+      ]
+    },
+    "right": {
+      "type": "DataFrame",
+      "shape": [
+        4,
+        3
+      ]
+    },
+    "how": "right",
+    "on": "city",
+    "left_on": null,
+    "right_on": null,
+    "left_index": false,
+    "right_index": false,
+    "sort": false,
+    "suffixes": [
+      "_x",
+      "_y"
+    ],
+    "copy": null,
+    "indicator": false,
+    "validate": null
+  }
+}

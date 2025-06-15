@@ -1,0 +1,14 @@
+{
+  "op": "unstack",
+  "args": {
+    "obj": {
+      "type": "Series",
+      "dtype": "object",
+      "length": 24
+    },
+    "level": "__placeholder__",
+    "fill_value": null,
+    "sort": true
+  },
+  "raw_code": "def unstack(obj: Series | DataFrame, level, fill_value=None, sort: bool = True):"
+}

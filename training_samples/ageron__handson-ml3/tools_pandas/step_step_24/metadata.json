@@ -1,0 +1,31 @@
+{
+  "op": "concat",
+  "args": {
+    "objs": [
+      {
+        "type": "DataFrame",
+        "shape": [
+          3,
+          4
+        ]
+      },
+      {
+        "type": "DataFrame",
+        "shape": [
+          3,
+          2
+        ]
+      }
+    ],
+    "axis": 1,
+    "join": "outer",
+    "ignore_index": false,
+    "keys": null,
+    "levels": null,
+    "names": null,
+    "verify_integrity": false,
+    "sort": false,
+    "copy": null
+  },
+  "raw_code": "def concat("
+}

@@ -1,0 +1,16 @@
+{
+  "op": "stack",
+  "args": {
+    "self": {
+      "type": "DataFrame",
+      "shape": [
+        4,
+        3
+      ]
+    },
+    "level": -1,
+    "dropna": "_NoDefault",
+    "sort": "_NoDefault",
+    "future_stack": false
+  }
+}

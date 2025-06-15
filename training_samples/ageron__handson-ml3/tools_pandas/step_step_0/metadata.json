@@ -1,0 +1,16 @@
+{
+  "op": "stack",
+  "args": {
+    "frame": {
+      "type": "DataFrame",
+      "shape": [
+        4,
+        3
+      ]
+    },
+    "level": -1,
+    "dropna": true,
+    "sort": true
+  },
+  "raw_code": "def stack(frame: DataFrame, level=-1, dropna: bool = True, sort: bool = True):"
+}

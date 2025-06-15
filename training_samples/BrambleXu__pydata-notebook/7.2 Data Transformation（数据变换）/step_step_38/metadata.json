@@ -1,0 +1,17 @@
+{
+  "op": "drop_duplicates",
+  "args": {
+    "self": {
+      "type": "DataFrame",
+      "shape": [
+        7,
+        2
+      ]
+    },
+    "subset": null,
+    "keep": "first",
+    "inplace": false,
+    "ignore_index": false
+  },
+  "raw_code": "def drop_duplicates("
+}

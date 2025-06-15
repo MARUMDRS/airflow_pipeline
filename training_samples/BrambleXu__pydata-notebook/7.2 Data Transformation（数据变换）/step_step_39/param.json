@@ -1,0 +1,18 @@
+{
+  "op": "drop_duplicates",
+  "args": {
+    "self": {
+      "type": "DataFrame",
+      "shape": [
+        7,
+        3
+      ]
+    },
+    "subset": [
+      "k1"
+    ],
+    "keep": "first",
+    "inplace": false,
+    "ignore_index": false
+  }
+}

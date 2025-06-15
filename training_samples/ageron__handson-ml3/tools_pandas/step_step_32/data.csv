@@ -1,0 +1,10 @@
+state,city,lat,lng,population
+CA,San Francisco,37.781334,-122.416728,
+NY,New York,40.705649,-74.008344,
+FL,Miami,25.7911,-80.320733,
+OH,Cleveland,41.473508,-81.739791,
+UT,Salt Lake City,40.755851,-111.896657,
+California,San Francisco,,,808976.0
+New-York,New York,,,8363710.0
+Florida,Miami,,,413201.0
+Texas,Houston,,,2242193.0

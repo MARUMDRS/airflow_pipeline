@@ -1,0 +1,18 @@
+{
+  "op": "unstack",
+  "args": {
+    "self": {
+      "type": "DataFrame",
+      "shape": [
+        12,
+        1
+      ]
+    },
+    "level": [
+      "month"
+    ],
+    "fill_value": null,
+    "sort": true
+  },
+  "raw_code": "def unstack(self, level: IndexLabel = -1, fill_value=None, sort: bool = True):"
+}

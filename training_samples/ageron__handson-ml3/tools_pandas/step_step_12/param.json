@@ -1,0 +1,25 @@
+{
+  "op": "pivot_table",
+  "args": {
+    "data": {
+      "type": "DataFrame",
+      "shape": [
+        12,
+        4
+      ]
+    },
+    "values": [
+      "grade",
+      "bonus"
+    ],
+    "index": "name",
+    "columns": null,
+    "aggfunc": "max",
+    "fill_value": null,
+    "margins": false,
+    "dropna": true,
+    "margins_name": "All",
+    "observed": "_NoDefault",
+    "sort": true
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "op": "pivot_table",
+  "args": {
+    "data": {
+      "type": "DataFrame",
+      "shape": [
+        12,
+        4
+      ]
+    },
+    "values": null,
+    "index": [
+      "name",
+      "month"
+    ],
+    "columns": null,
+    "aggfunc": "mean",
+    "fill_value": null,
+    "margins": true,
+    "dropna": true,
+    "margins_name": "All",
+    "observed": "_NoDefault",
+    "sort": true
+  },
+  "raw_code": "@Substitution(\"\\ndata : DataFrame\")"
+}

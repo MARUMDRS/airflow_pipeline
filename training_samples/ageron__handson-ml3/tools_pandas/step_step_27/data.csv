@@ -1,0 +1,7 @@
+state_x,city,lat,lng,population,state_y
+OH,Cleveland,41.473508,-81.739791,,
+,Houston,,,2242193.0,Texas
+FL,Miami,25.7911,-80.320733,413201.0,Florida
+NY,New York,40.705649,-74.008344,8363710.0,New-York
+UT,Salt Lake City,40.755851,-111.896657,,
+CA,San Francisco,37.781334,-122.416728,808976.0,California

@@ -1,0 +1,17 @@
+{
+  "op": "unstack",
+  "args": {
+    "self": {
+      "type": "DataFrame",
+      "shape": [
+        12,
+        1
+      ]
+    },
+    "level": [
+      "month"
+    ],
+    "fill_value": null,
+    "sort": true
+  }
+}

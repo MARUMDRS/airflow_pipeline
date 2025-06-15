@@ -1,0 +1,4 @@
+age,body_mass_index,height,hobby,over 30,overweight,pets,weight
+33,22.985397512168742,172,Biking,True,False,,68
+34,25.33500198406642,181,Dancing,True,False,0.0,83
+26,32.72461650840029,185,,False,True,5.0,112

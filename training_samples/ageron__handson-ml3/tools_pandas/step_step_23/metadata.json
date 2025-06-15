@@ -1,0 +1,147 @@
+{
+  "op": "concat",
+  "args": {
+    "objs": [
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      },
+      {
+        "type": "Series",
+        "dtype": "float64",
+        "length": 8
+      }
+    ],
+    "axis": 1,
+    "join": "outer",
+    "ignore_index": false,
+    "keys": null,
+    "levels": null,
+    "names": null,
+    "verify_integrity": false,
+    "sort": false,
+    "copy": null
+  },
+  "raw_code": "def concat("
+}

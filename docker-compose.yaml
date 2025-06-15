@@ -76,6 +76,7 @@ x-airflow-common:
     # If you want to use it, outcomment it and replace airflow.cfg with the name of your config file
     AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
     PYTHONPATH: /opt/airflow 
+    KAGGLE_CONFIG_DIR: /home/airflow/.kaggle
   volumes:
     - ${AIRFLOW_PROJ_DIR:-./airflow}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-./airflow}/logs:/opt/airflow/logs
@@ -84,8 +85,11 @@ x-airflow-common:
     # Add git_hub_crawler to the volumes to be able to run it in the container
     - ${AIRFLOW_PROJ_DIR:-./airflow}/github_crawler:/opt/airflow/github_crawler
     - ${AIRFLOW_PROJ_DIR:-./airflow}/dataset_retriever:/opt/airflow/dataset_retriever
-     
+    - ${AIRFLOW_PROJ_DIR:-./airflow}/notebook_replayer:/opt/airflow/notebook_replayer
+
+    - ${AIRFLOW_PROJ_DIR:-./airflow}/../training_samples:/opt/airflow/training_samples
     - ${AIRFLOW_PROJ_DIR:-./airflow}/../github_repos:/opt/airflow/github_repos
+    - ${AIRFLOW_PROJ_DIR:-./airflow}/kaggle/kaggle.json:/home/airflow/.kaggle/kaggle.json
 
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:

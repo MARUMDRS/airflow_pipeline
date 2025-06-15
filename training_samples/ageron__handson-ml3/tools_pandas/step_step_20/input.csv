@@ -1,0 +1,13 @@
+name,month,grade,bonus
+alice,sep,8.0,
+alice,oct,8.0,
+alice,nov,9.0,
+bob,sep,10.0,0.0
+bob,oct,9.0,
+bob,nov,10.0,2.0
+charles,sep,4.0,3.0
+charles,oct,11.0,3.0
+charles,nov,5.0,0.0
+darwin,sep,9.0,0.0
+darwin,oct,10.0,1.0
+darwin,nov,11.0,0.0

@@ -11,9 +11,13 @@ from dataset_retriever.resolver import (
     kaggle_crawler,
 )
 from dataset_retriever.config import SAVE_DIR
+from dataset_retriever.resolver import resolve_datasets_in_repo
 
 from pathlib import Path
 import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 default_args = {
     'owner': 'airflow',
@@ -23,17 +27,19 @@ default_args = {
     'retry_delay': timedelta(minutes=3),
 }
 
+
 def fetch_pending_repos(**context):
+    logger.info("[FETCH] Connecting to MongoDB to find pending repos...")
     collection = get_collection()
     pending = list(collection.find({
         "has_pandas": True,
         "checked_for_datasets": { "$ne": True }
     }))
     repo_ids = [r["_id"] for r in pending]
+    logger.info(f"[FETCH] Found {len(repo_ids)} repos to process.")
     context['ti'].xcom_push(key='pending_repo_ids', value=repo_ids)
 
 def resolve_datasets(**context):
-    from dataset_retriever.config import SAVE_DIR
     repo_ids = context['ti'].xcom_pull(key='pending_repo_ids', task_ids='fetch_pending_repos')
 
     base_path = Path(SAVE_DIR)
@@ -44,50 +50,27 @@ def resolve_datasets(**context):
         repo_name = repo_id.split("/")[-1]
         repo_path = next((d for d in all_dirs if repo_name in d.name), None)
 
-        logging.info(f"Checking repo path for {repo_id}: resolved → {repo_path}")
+        logger.info(f"[RESOLVE] Checking repo path for {repo_id}: resolved → {repo_path}")
         if not repo_path or not repo_path.exists():
-            logging.warning(f"[SKIP] No local directory matched for {repo_id}")
+            logger.warning(f"[RESOLVE][SKIP] No local directory matched for {repo_id}")
             continue
 
         total += 1
-        notebooks = list(repo_path.rglob("*.ipynb"))
-        if not notebooks:
-            logging.info(f"No notebooks found in {repo_path}")
-            update_repo_status(repo_id, False)
-            continue
 
-        found_any = False
-        for nb in notebooks:
-            filenames = extract_filenames_from_notebook(nb)
-            if filenames:
-                logging.debug(f"{nb.name} → filenames: {filenames}")
-            else:
-                logging.debug(f"{nb.name} → no filename matches.")
+        try:
+            dataset_found, notebooks_with_dataset = resolve_datasets_in_repo(repo_path, repo_id)
+            update_repo_status(repo_id, dataset_found=dataset_found, notebooks_with_dataset=notebooks_with_dataset)
 
-            for name in filenames:
-                name = Path(name).name  # strip directories
-                if find_dataset_in_repo(repo_path, name):
-                    found_any = True
-                    break
+            logger.info(f"[RESOLVE] Repo: {repo_id} → Dataset found: {dataset_found}")
+            logger.debug(f"[RESOLVE] Notebooks with datasets: {notebooks_with_dataset}")
 
-                for url in search_for_urls_in_notebook(nb):
-                    if name in url:
-                        if try_download_url(url, nb.parent / name):
-                            found_any = True
-                            break
+            if dataset_found:
+                success += 1
+        except Exception as e:
+            logger.error(f"[RESOLVE] ❌ Failed resolving datasets for {repo_id}: {e}")
+            update_repo_status(repo_id, dataset_found=False)
 
-                if not found_any and kaggle_crawler(name, nb.parent):
-                    found_any = True
-
-            if found_any:
-                break
-
-        update_repo_status(repo_id, found_any)
-        if found_any:
-            success += 1
-        logging.info(f"[{repo_id}] → Dataset found: {found_any}")
-
-    logging.info(f"Dataset resolution complete: {success}/{total} successful ({(success/total*100 if total else 0):.2f}%)")
+    logger.info(f"[RESOLVE] ✅ Dataset resolution complete: {success}/{total} successful ({(success/total*100 if total else 0):.2f}%)")
 
 with DAG(
     dag_id='dataset_resolver_dag',

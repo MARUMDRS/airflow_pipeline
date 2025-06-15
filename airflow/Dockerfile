@@ -5,7 +5,7 @@ USER root
 # Update apt before installing necessary libs
 RUN apt-get update
 # Install necessary libs
-RUN apt-get install -y apt-utils build-essential gcc curl
+RUN apt-get install -y apt-utils build-essential gcc curl wget unzip git-all
 
 # Java folder inside tar-gz file
 ENV JAVA_FOLDER jdk-17.0.12
@@ -18,6 +18,9 @@ ENV JAVA_PKG_NAME jdk-17.0.12_linux-x64_bin.tar.gz
 # Java download URL
 ENV JAVA_TAR_GZ_URL https://download.oracle.com/java/17/archive/$JAVA_PKG_NAME
 
+# Create .kaggle directory and add kaggle.json file
+# COPY ../kaggle.json /root/.kaggle/kaggle.json
+# RUN chmod 600 /root/.kaggle/kaggle.json
 
 # Update apt again before installing wget; Install wget; Remove the apt lists
 RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*    && \
@@ -45,20 +48,42 @@ RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*    
 ENV JAVA_HOME=/usr/lib/jvm/jdk-17.0.12/
 ENV PATH="/usr/lib/jvm/jdk-17.0.12/bin:${PATH}"
 
-# Create .kaggle directory and add kaggle.json file
-COPY ../kaggle.json /root/.kaggle/kaggle.json
-RUN chmod 600 /root/.kaggle/kaggle.json
+# #RUN apt-get update && apt-get install -y git-all
+# # Install Git, unzip, pip, and Kaggle CLI
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     git-all \
+#     unzip \
+#     python3-pip \
+#  && pip install --no-cache-dir kaggle \
+#  && chmod +x /usr/local/bin/kaggle \
+#  && mkdir -p /home/airflow/.kaggle \
+#  && cp /root/.kaggle/kaggle.json /home/airflow/.kaggle/kaggle.json \
+#  && chmod 600 /home/airflow/.kaggle/kaggle.json \
+#  && rm -rf /var/lib/apt/lists/*
 
-#RUN apt-get update && apt-get install -y git-all
-# Install Git, unzip, pip, and Kaggle CLI
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git-all \
-    unzip \
-    python3-pip \
- && pip install --no-cache-dir kaggle \
- && rm -rf /var/lib/apt/lists/*
+# ------------------------------------------------------------
+# !!!! TEMP copy kaggle.json to a temp file as root
+# ------------------------------------------------------------
+# COPY kaggle.json /tmp/kaggle.json
+# RUN chmod 600 /tmp/kaggle.json && chown airflow: /tmp/kaggle.json
 
- 
+# ------------------------------------------------------------
+# Switch to airflow and set up Kaggle CLI
+# ------------------------------------------------------------
 USER airflow
+
+# Move kaggle.json to airflow's home and install kaggle CLI
+ENV PATH="/home/airflow/.local/bin:${PATH}"
+RUN pip install --no-cache-dir kaggle
+# RUN mkdir -p /home/airflow/.kaggle && \
+#     mv /tmp/kaggle.json /home/airflow/.kaggle/kaggle.json && \
+#     chmod 600 /home/airflow/.kaggle/kaggle.json
+
+# Install kaggle CLI as airflow (no pip-as-root warnings)
+
+
+# ------------------------------------------------------------
+# Install additional Python requirementsS
+# ------------------------------------------------------------
 COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
