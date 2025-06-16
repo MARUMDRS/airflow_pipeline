@@ -13,7 +13,7 @@ The system leverages:
 
 The overall architecture is illustrated below:
 
-![Airflow Architecture](/images/Airflow Architecture.png)
+![Airflow Architecture](/images/Airflow_Architecture.png)
 
 ---
 
