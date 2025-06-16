@@ -22,6 +22,7 @@ def fetch_github_repositories():
     end_cursor = load_cursor()
     has_next_page = True
 
+
     while has_next_page and total_collected < TARGET_REPO_COUNT:
         query = """
         query ($queryString: String!, $first: Int!, $after: String) {
@@ -73,6 +74,13 @@ def fetch_github_repositories():
             page_info = search_data["pageInfo"]
             has_next_page = page_info.get("hasNextPage", False)
             new_cursor = page_info.get("endCursor")
+
+
+            if new_cursor == end_cursor:
+                logger.warning("[GRAPHQL] Same cursor received again — pagination may be stuck. Breaking.")
+                break
+
+            logger.info(f"[GRAPHQL] hasNextPage: {has_next_page} | endCursor: {new_cursor}")
 
             if has_next_page and new_cursor:
                 end_cursor = new_cursor
