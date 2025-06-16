@@ -4,6 +4,7 @@ from airflow.utils.dates import days_ago
 from datetime import timedelta
 from pathlib import Path
 import logging
+from notebook_replayer.utils import cleanup_all_empty_dirs
 
 from notebook_replayer.config import SAVE_DIR
 from notebook_replayer.mongo_handler import (
@@ -106,6 +107,11 @@ def replay_pending_notebooks(**context):
             "details": xcom_summary,
         },
     )
+    
+def cleanup_empty_dirs_task():
+    # Adjust the directories you want to clean
+    cleanup_all_empty_dirs(Path("training_data"))
+    cleanup_all_empty_dirs(Path("training_samples"))
 
 with DAG(
     dag_id="notebook_replayer_dag",
@@ -121,3 +127,10 @@ with DAG(
         task_id="replay_pending_notebooks",
         python_callable=replay_pending_notebooks,
     )
+
+    run_cleanup = PythonOperator(
+        task_id="cleanup_exports",
+        python_callable=cleanup_empty_dirs_task,
+    )
+
+run_replayer >> run_cleanup

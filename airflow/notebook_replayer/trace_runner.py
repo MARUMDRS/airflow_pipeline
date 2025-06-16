@@ -92,7 +92,7 @@ def trace_pandas_ops(exec_env: dict, base_output_path: Path):
                 if op_index[0] is None:
                     op_index[0] = next(step_counter)
 
-                step_id = f"step_{op_index[0]}"
+                step_id = str(op_index[0])
                 export_path = base_output_path / step_id
                 export_path.mkdir(parents=True, exist_ok=True)
 

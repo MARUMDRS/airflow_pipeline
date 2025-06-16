@@ -127,3 +127,18 @@ def export_autosuggest_example(
     # Export operator parameters
     with open(export_dir / "param.json", "w", encoding="utf-8") as f:
         json.dump(args_dict, f, indent=2)
+
+def cleanup_all_empty_dirs(base_path: Path):
+    """
+    Recursively removes all empty folders under the given base_path.
+    """
+    if not base_path.exists():
+        return
+
+    for subdir in base_path.rglob("*"):
+        if subdir.is_dir() and not any(subdir.iterdir()):
+            try:
+                subdir.rmdir()
+                logger.info(f"[CLEANUP] Removed empty directory: {subdir}")
+            except Exception as e:
+                logger.warning(f"[CLEANUP] Failed to remove {subdir}: {e}")
