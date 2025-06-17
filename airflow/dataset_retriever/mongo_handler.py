@@ -1,5 +1,3 @@
-# mongo_handler.py
-
 from datetime import datetime
 from pymongo import MongoClient, errors
 from dataset_retriever.config import MONGO_URL, MONGO_DB, MONGO_REPO_COLLECTION

@@ -1,5 +1,3 @@
-# executor.py
-
 import os
 import nbformat
 import logging

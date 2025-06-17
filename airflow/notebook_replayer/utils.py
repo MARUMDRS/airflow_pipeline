@@ -82,7 +82,6 @@ def cleanup_notebook_export_dir(notebook_name: str):
     export_path = Path(TRAINING_OUTPUT_DIR) / notebook_name
 
     if not export_path.exists():
-        # ✅ Do nothing if the dir never existed
         return
 
     if export_path.is_dir() and not any(export_path.iterdir()):

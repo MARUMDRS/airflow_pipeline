@@ -1,5 +1,3 @@
-# repository.py
-
 import pendulum
 
 local_tz = pendulum.timezone("Europe/Athens")
